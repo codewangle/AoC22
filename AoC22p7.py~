@@ -1,0 +1,99 @@
+#!usr/bin/env python 3
+#This is my solution to day 7 of Advent of Code's 2022 puzzles. 
+
+f = open("p7input.txt")
+#f = open("p7sampleinput.txt")
+
+class directory:
+    def __init__(self, name, parent = None, size = 0 ):
+        self.name = name
+        self.size = size
+        self.parent = parent
+        self.dir = {}
+
+    def Size():
+        return self.size
+
+
+def cd(working_directory, destination):
+    return working_directory.dir[destination]
+
+def cde(working_directory):
+    return working_directory.parent
+
+def cds(working_directory):
+    if working_directory.parent == None:
+        return working_directory
+    else:
+        cds(working_directory.parent)
+
+
+data = []
+user = directory("C")
+for string in f:
+    data.append(string.split("\n")[0])
+    #s_input = string.split(" ")
+    #if s_input[0] == "$":
+       # if s_input[1] == "cd":
+       #     break
+
+wd = user
+for command in data:
+    if command.split(" ")[0] == "$":
+        if command.split(" ")[1] == "cd":
+            if command.split(" ")[2] == "/":
+                wd = cds(wd)
+            elif command.split(" ")[2] == "..":
+                wd = cde(wd)
+            else:
+                wd = cd(wd, command.split(" ")[2])
+    if command.split(" ")[0] == "dir":
+       # print(command)
+        wd.dir[command.split(" ")[1]] = directory(command.split(" ")[1], wd)
+#        print(wd.dir)
+    elif command.split(" ")[0].isnumeric() == True:
+       # print(command)
+        wd.dir[command.split(" ")[1]] = command.split(" ")[0] 
+
+
+
+def get_size(target_file):
+    total_size = 0
+    small_size = 0
+    for i in target_file.dir:
+        if isinstance(target_file.dir[i], directory) and target_file.dir[i].size == 0 and len(target_file.dir[i].dir) !=0:
+            file_size, fs = get_size(target_file.dir[i])
+            total_size = total_size + file_size
+            if file_size <= 100000:
+                small_size = small_size + fs
+            else:
+                small_size = small_size + fs
+        else:
+     #       print(target_file.dir[i])
+            total_size = total_size + int(target_file.dir[i])
+    target_file.size = total_size
+    #print(total_size, small_size, total_size <= 100000)
+    if total_size <= 100000:
+        small_size = small_size + total_size
+    return total_size, small_size
+
+def find_minf(folder, N):
+    count = 0
+    if folder.size > N:
+        count = count + folder.size
+        print(count, folder.name, folder.size)
+    for i in folder.dir:
+        if isinstance(folder.dir[i], directory):
+            deepsize = find_minf(folder.dir[i], N)
+            if deepsize < count:
+                count = deepsize
+        print(count)
+    return count
+
+
+print(get_size(user))
+N = 30000000 - (70000000 - user.size)
+print(find_minf(user, N))
+
+    
+

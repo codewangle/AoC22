@@ -1,0 +1,42 @@
+#!usr/bin/env python3
+#This is a program to solve Advent of Code's 2022 Day 2 puzzles. 
+
+f = open('p2input.txt')
+#f = open('p2sampleinput.txt')
+score = 0
+key = {'X': 1, 'Y':2, 'Z':3}
+grade = {'R240': 6, 'R0':3, 'R120':0}
+d3 = {'X': [0,2,1], 'Y': [1,0,2], 'Z': [2,1,0], 'R0':[0,1,2], 'R120': [2,0,1], 'R240': [1,2,0]} 
+d3i = {'X': 'X', 'Y': 'Y', 'Z': 'Z', 'R0': 'R0', 'R120': 'R240', 'R240': 'R120' }
+roset = {'A':'X', 'B':'Y', 'C':'Z', 'W': 'R240', 'L': 'R120', 'D': 'R0' }
+rev = {'X': 'R120', 'Y': 'R0', 'Z': 'R240'}
+
+def md3(x,y):
+    prod = []
+    for i in d3[x]:
+        prod.append(d3[y][i])
+    return list(d3.keys())[list(d3.values()).index(prod)]
+l = []
+m = []
+score2 = 0
+for i in f:
+    j = i[:-1]
+    k = j.split()
+    k2 = j.split()
+    subscore = grade[md3(roset[k[0]], k[1])] + key[k[1]]
+    score = score + subscore
+    k.append(subscore)
+    l.append(k)
+
+    shape = md3(roset[k[0]], rev[k[1]])
+    subscore2 = grade[rev[k[1]]] + key[shape]
+    score2 = score2 + subscore2
+    k2.append([subscore2, rev[k[1]], shape])
+    m.append(k2)
+    
+
+print(score)
+print(score2)
+
+
+

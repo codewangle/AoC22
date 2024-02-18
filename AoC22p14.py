@@ -1,0 +1,100 @@
+#!usr/bin/env python 3
+#This is my solution to day 14 of Advent of Code's 2022 daily puzzles. 
+
+#f = open("p14input.txt")
+f = open("p14sampleinput.txt")
+
+instructions = []
+for line in f:
+    steps = line.split("->")
+    line_instructions = []
+    for step in steps:
+        coords = step.strip().split(",")
+        line_instructions.append((int(coords[0]), int(coords[1])))
+    instructions.append(line_instructions)
+
+
+grid = []
+for line in instructions:
+    for j, step in enumerate(line):
+       # print(step)
+        x, y = step
+        if j == 0:
+            curr = (x,y)
+            grid.append(curr)
+            continue
+        if curr[0] == x:
+            if y > curr[1]:
+                for i in range(0, y - curr[1]):
+                    grid.append((x, curr[1] + i + 1))
+            if y < curr[1]:
+                for i in range(0, curr[1] - y):
+                    grid.append((x, curr[1] - i - 1))
+            curr = (x, y)
+            continue
+        if curr[1] == y:
+            if x > curr[0]:
+                for i in range(0, x- curr[0]):
+                    grid.append((curr[0] + i + 1, y))
+            if x < curr[0]:
+                for i in range(0, curr[0] - x):
+                    grid.append((curr[0] - i - 1, y))
+            curr = (x, y)
+            continue
+        curr = (x, y)
+
+#print(grid)
+
+def gen_sand(start, grid, floor):
+    x, y = start
+    if (500, 0) in grid:
+        return False
+    #for k, coord in enumerate(grid):
+    #    if coord[0] == x and coord[1] >= y:
+    #        break
+    #    else:
+    #        if k == len(grid) - 1:
+    #            return False
+    if y == floor:
+        grid.append((x, y-1))
+        return True
+    if (x, y) in grid:
+        if (x - 1, y) not in grid:
+            return gen_sand((x-1, y), grid, floor)
+        elif (x+1, y) not in grid:
+            return gen_sand((x+1, y), grid, floor)
+        else:
+            grid.append((x,y - 1))
+            return True
+    else: 
+        i = 0
+ #       print(i, (x, y))
+        while ((x, y + i) not in grid and not y != floor) or (not ((x, y + i) not in grid) and y != floor):
+            i = i + 1
+        return gen_sand((x, y + i), grid, floor)
+
+cgrid = grid.copy()
+counter = 0
+#while gen_sand((500,0), grid):
+#    counter = counter + 1
+  #  print(grid)
+
+#print(counter)
+
+
+#part 2
+
+y_max = 0
+for step in cgrid:
+    if step[1] > y_max:
+        y_max = step[1]
+
+floor = y_max + 2
+
+while gen_sand((500, 0), grid, floor):
+    counter = counter + 1
+    print(grid)
+
+print(counter)
+
+

@@ -1,0 +1,34 @@
+#!usr/bin/env python 3
+#My solution to day 6 of Advent of Code's 2022 puzzles.
+
+from primes import primes as primes
+import math
+
+
+f = open("p6input.txt")
+#f = open("p6sampleinput.txt")
+
+Primes = primes()
+
+position = 0
+for string in f:
+    index = 0
+    if position != 0:
+        break
+    for letter in string:
+        if position != 0:
+            break
+        value = 1
+        if letter == '\n':
+            continue
+        for i in range(0,14):
+            if math.gcd(value, Primes[int(ord(string[index + i]))-97]) == 1:
+                value = value*Primes[int(ord(string[index + i]))-97]
+            else:
+                break
+            if i == 13:
+                position = index
+        index = index + 1
+
+print(position+14)
+

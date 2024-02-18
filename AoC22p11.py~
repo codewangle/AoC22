@@ -1,0 +1,65 @@
+#!usr/bin/env python 3 
+#This program is my solution to day 11 of Advent of Code's 2022 puzzles. 
+
+import math
+
+#f = open("p11input.txt")
+f = open("p11exampleinput.txt")
+
+
+class monkey:
+    def __init__(self, worry_list = [], operation = 1, test = 1, contrue = None, confalse = None, count = 0, factor = 1):
+        self.worry_list = worry_list
+        self.operation = operation
+        self.test = test
+        self.contrue = contrue
+        self.confalse = confalse
+        self.count = count
+        self.factor = factor
+
+monkeys = []
+for line in f:
+    new_line = line.strip().split(":")
+    if len(new_line) != 1:
+        if new_line[0].split(" ")[0] == "Monkey":
+            monkeys.append(monkey())
+        if new_line[0] == "Starting items":
+            monkeys[-1].worry_list = ([int(n) for n in new_line[1].strip().split(",")])
+        if new_line[0] == "Operation":
+            fcall = new_line[1].replace("old", "x")
+            fcall = fcall.replace("new = ", "")
+            exec("def f(x): return " + fcall)
+            monkeys[-1].operation = f
+        if new_line[0] == "Test":
+            tcall = new_line[1].replace(" ",",").split(",")[3]
+            monkeys[-1].factor = int(tcall)
+            exec("def g(x): return x%" + tcall + "==0" )
+            monkeys[-1].test = g
+        if new_line[0] == "If true":
+            monkeys[-1].contrue = int(new_line[1].split(" ")[4])
+        elif new_line[0] == "If false":
+            monkeys[-1].confalse = int(new_line[1].split(" ")[4])
+
+
+def mround(monkey_list):
+    for monkey in monkey_list:
+        for item in monkey.worry_list:
+            worry_level = monkey.operation(item)
+            #worry_level = math.floor(worry_level/3)
+            worry_level = worry_level%(13*17*19*23)
+            if monkey.test(worry_level):
+                monkey_list[monkey.contrue].worry_list = monkey_list[monkey.contrue].worry_list.copy() + [worry_level]
+                monkey.count = monkey.count + 1
+            else:
+                monkey_list[monkey.confalse].worry_list = monkey_list[monkey.confalse].worry_list.copy() + [worry_level]
+                monkey.count = monkey.count + 1
+        monkey.worry_list = []
+
+
+       
+
+for i in range(10000):
+    mround(monkeys)
+
+for monkey in monkeys:
+    print(monkey.worry_list, monkey.count)
